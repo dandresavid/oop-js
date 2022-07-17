@@ -186,7 +186,7 @@ console.log(account.latest)
 
 account.latest = 50;
 console.log(account.latest)
-*/
+
 
 const PersonProto = {
     calcAge(){
@@ -209,6 +209,7 @@ console.log(steven.__proto__ === PersonProto);
 const sarah = Object.create(PersonProto);
 sarah.init('Sarah Fanco', 1979);
 sarah.calcAge();
+*/
 
 // Challenge 2
 
@@ -256,7 +257,7 @@ sarah.calcAge();
 
 ///////////////////////////////
 //Inheritance Between "Classes": Constructor Fuctions
-
+/*
 const Person = function (firstName, birthYear) {
     this.firstName = firstName;
     this.birthYear = birthYear;
@@ -346,3 +347,189 @@ class StudentCl extends PersionCl{
 const martha = new StudentCl('Martha Jones' ,2012, 'Computer Science')
 martha.introduce();
 martha.calcAge();
+
+///////////////////////
+// Inheritance Between "Classes" : Object.create
+
+
+const PersonProto = {
+    calcAge(){
+        console.log(2037 - this.birthYear);
+    },
+    init(firstName, bithYear){
+        this.firstName = firstName;
+        this.birthYear = bithYear;
+    },
+};
+
+const steven = Object.create(PersonProto);
+
+const StudentProto = Object.create(PersonProto);
+StudentProto.init = function(firstName,birthYear,course){
+    PersonProto.init.call(this, firstName, birthYear);
+    this.course = course;
+};
+StudentProto.introduce = function () {
+    console.log(`My name is ${this.firstName} and I study ${this.course}`);
+}
+
+const jay = Object.create(StudentProto);
+jay.init('Jay', 2010, 'Computer Science');
+jay.introduce();
+jay.calcAge();
+*/
+
+// Public fields
+// Private fields
+// Public methods
+// Private methods
+// (There is also the static version)
+
+class Account {
+    // Public fields (Instances)
+    locale = navigator.language;
+    #movements = [];
+    #pin;
+    constructor(owner, currency, pin ){
+        this.owner = owner;
+        this.currency = currency;
+        // protected property
+        this.#pin = pin;
+        //this._movements = [];
+        //this.locale = navigator.language;
+
+        console.log(`Thanks for opening and account, ${owner}`)
+    }
+    // Public interface or Public Methods
+    getMovements(){
+        return this.#movements;
+    }
+
+    deposit(val) {
+        this.#movements.push(val);
+        return this;
+    }
+    withdraw (val) {
+        this.deposit(-val);
+        return this;
+
+    }
+    // Protected method
+    // _approveLoan(val){
+    //     return true;
+    // }
+    requestLoan(val) {
+        if(this.#approveLoan(val)){
+            this.deposit(val);
+            console.log(`Loan approved`)
+            return this;
+        }
+    }
+    //Private method
+    #approveLoan(val){
+        return true;
+    }
+    //Static methods would make the me available in the clase not in the instance
+    static helper(name){
+        console.log(`How can I help you, ${name}?`);
+    }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+acc1.deposit(250);
+acc1.withdraw(140);
+acc1.requestLoan(1000);
+Account.helper('Andres'); 
+
+console.log(acc1);
+//Private field, it cannt be accessed
+//console.log(acc1.#pin);
+//console.log(acc1).getMovements();
+//console.log(acc1.#approveLoan(1000))
+
+acc1.deposit(300).deposit(500).withdraw(35).requestLoan(25000).withdraw(4000);
+console.log(acc1.getMovements());
+
+
+
+// Challenge #4
+
+class CarCl {
+    constructor(make, speed){
+        this.make = make;
+        this.speed = speed;
+    }
+    accelerate(){
+        this.speed += 10;
+        console.log(`${this.make} is going at ${this.speed} km/h`);
+    }
+    brake (){
+        this.speed -= 5;
+        console.log(`${this.make} is going at ${this.speed} km/h`)
+        return this
+    }
+    getSpeedUS(){
+        console.log(`${this.make} is going at ${this.speed/1.6} Mil/h`);
+    }
+    setSpeedUS(speedUS){
+        this.speed = speedUS*1.6;
+        console.log(`${this.make} is going at ${this.speed*1.6} Mil/h`);
+
+    }
+
+}
+
+const ford = new CarCl(`ford`, 120);
+ford.getSpeedUS();
+
+ford.accelerate();
+ford.accelerate();
+ford.accelerate();
+ford.brake();
+ford.brake();
+ford.getSpeedUS();
+ford.brake();
+ford.brake();
+ford.setSpeedUS(130);
+ford.getSpeedUS();
+
+console.log(ford);
+
+class EVCl extends CarCl {
+
+    #charge;
+
+    constructor (make, speed, charge) {
+        super(make,speed);
+        this.#charge = charge
+        //CarCl.call(this, make, speed);
+    }
+
+    chargeBattery (chargeTo){
+        this.#charge = chargeTo;
+        return this;
+    }
+    accelerate (){
+        this.speed += 20;
+        this.#charge --;
+        console.log(`${this.make} going at ${this.speed} km/h, with a charge of ${this.#charge}`);
+        return this;
+    }
+}
+
+const rivianEV = new EVCl(`Rivian`, 120, 23)
+console.log(rivianEV.__proto__);
+console.log(rivianEV.__proto__.__proto__);
+console.log(rivianEV.__proto__.__proto__.__proto__);
+console.log(rivianEV.__proto__.__proto__.__proto__.__proto__);
+rivianEV.accelerate();
+rivianEV.chargeBattery(90);
+console.log(rivianEV);
+
+rivianEV.brake().accelerate().chargeBattery(50).accelerate();
+console.log(rivianEV);
+
+console.log(rivianEV.charge);
+
+
+
